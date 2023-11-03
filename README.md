@@ -1,6 +1,8 @@
 # IT.Xml.C14N
 [![NuGet version (IT.Xml.C14N)](https://img.shields.io/nuget/v/IT.Xml.C14N.svg)](https://www.nuget.org/packages/IT.Xml.C14N)
 [![NuGet pre version (IT.Xml.C14N)](https://img.shields.io/nuget/vpre/IT.Xml.C14N.svg)](https://www.nuget.org/packages/IT.Xml.C14N)
+[![GitHub Actions](https://github.com/pairbit/IT.Xml.C14N/workflows/Build/badge.svg)](https://github.com/pairbit/IT.Xml.C14N/actions)
+[![Releases](https://img.shields.io/github/release/pairbit/IT.Xml.C14N.svg)](https://github.com/pairbit/IT.Xml.C14N/releases)
 
 Implementation of C14N XML Transform
 
@@ -9,7 +11,7 @@ Implementation of C14N XML Transform
 ```csharp
 var xml = "<Doc b='2' a='1'><Field>Multi\r\nline text</Field></Doc>";
 var xmlC14N = "<Doc a=\"1\" b=\"2\"><Field>Multi\nline text</Field></Doc>";
-var hashC14N = Convert.FromBase64String("tI92wp7PvAzJtPeXXJmT/BWpB4Cvnrw+28GfC3m4AWw=");
+var hashC14N = Convert.FromBase64String("/VfhzVfGVK9EQibaw14T+h+BuduE02JYxobW1T+0fRo=");
 
 using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
 
@@ -20,7 +22,7 @@ var transformedStream = (Stream)c14N.GetOutput();
 var transformedBytes = new byte[transformedStream.Length];
 transformedStream.Read(transformedBytes, 0, transformedBytes.Length);
 
-using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
+using var hashAlg = SHA256.Create();
 var hash = hashAlg.ComputeHash(transformedBytes);
 Assert.That(hash.SequenceEqual(hashC14N));
 
@@ -32,9 +34,9 @@ Assert.That(transformedXml, Is.EqualTo(xmlC14N));
 
 ```csharp
 var xml = "<Doc b='2' a='1'><Field>Multi\r\nline text</Field></Doc>";
-var hashC14N = Convert.FromBase64String("tI92wp7PvAzJtPeXXJmT/BWpB4Cvnrw+28GfC3m4AWw=");
+var hashC14N = Convert.FromBase64String("/VfhzVfGVK9EQibaw14T+h+BuduE02JYxobW1T+0fRo=");
 
-using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
+using var hashAlg = SHA256.Create();
 using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
 
 var c14N = new XmlDsigExcC14NTransform();
