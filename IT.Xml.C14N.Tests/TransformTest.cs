@@ -53,7 +53,7 @@ public class TransformTest
     {
         using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
 
-        var stream = new MemoryStream(_dataBytes);
+        using var stream = new MemoryStream(_dataBytes);
 
         var hash1 = IT_TransformC14(stream, hashAlg);
 
@@ -70,8 +70,6 @@ public class TransformTest
         var c14NTransform = new XmlDsigExcC14NTransform();
 
         c14NTransform.LoadInput(input);
-
-        //var ou = c14NTransform.GetOutput();
 
         return c14NTransform.GetDigestedOutput(hashAlg);
     }
