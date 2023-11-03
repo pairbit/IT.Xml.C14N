@@ -20,14 +20,15 @@ public class TransformTest
         //<Doc><Field>Значение\r\nполя документа</Field></Doc>
         _dataBytes = Convert.FromBase64String("PERvYz48RmllbGQ+0JfQvdCw0YfQtdC90LjQtQ0K0L/QvtC70Y8g0LTQvtC60YPQvNC10L3RgtCwPC9GaWVsZD48L0RvYz4=");
         _dataString = Encoding.UTF8.GetString(_dataBytes);
-        _hash = Convert.FromBase64String("oQwkI5hh95o6owmW29XJRFFI7Ne5k4HDe5wHcHpJmCM=");
+        //_hash = Convert.FromBase64String("oQwkI5hh95o6owmW29XJRFFI7Ne5k4HDe5wHcHpJmCM=");
+        _hash = Convert.FromBase64String("4oWG0jf8D+nVsaER1B4CqdKN5ucFUQ4+NVW3WpY/78o=");
     }
 
     [Test]
     public void XmlDocument_Test()
     {
-        using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
-
+        //using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
+        using var hashAlg = SHA256.Create();
         var data = _dataString;
 
         if (data.Contains("\r\n"))
@@ -51,7 +52,8 @@ public class TransformTest
     [Test]
     public void Stream_Test()
     {
-        using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
+        //using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
+        using var hashAlg = SHA256.Create();
 
         using var stream = new MemoryStream(_dataBytes);
 
