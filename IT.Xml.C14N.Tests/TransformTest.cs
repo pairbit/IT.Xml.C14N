@@ -44,9 +44,9 @@ public class TransformTest
         var hash1 = IT_TransformC14(doc, hashAlg);
         var hash2 = Sys_TransformC14(doc, hashAlg);
 
-        Assert.IsTrue(hash1.SequenceEqual(hash2));
+        Assert.That(hash1.SequenceEqual(hash2), Is.True);
 
-        Assert.IsTrue(_hash.SequenceEqual(hash1));
+        Assert.That(_hash.SequenceEqual(hash1), Is.True);
     }
 
     [Test]
@@ -62,9 +62,9 @@ public class TransformTest
         stream.Position = 0;
         var hash2 = Sys_TransformC14(stream, hashAlg);
 
-        Assert.IsTrue(hash1.SequenceEqual(hash2));
+        Assert.That(hash1.SequenceEqual(hash2), Is.True);
 
-        Assert.IsTrue(_hash.SequenceEqual(hash1));
+        Assert.That(_hash.SequenceEqual(hash1), Is.True);
     }
 
     private static byte[] IT_TransformC14(object input, HashAlgorithm hashAlg)
