@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 
@@ -19,34 +20,44 @@ internal class ExcCanonicalXmlTest
         var str = "<Doc   a  =  '1'  ><!--comment-->Text</Doc >";
         var strC14N = "<Doc a=\"1\">Text</Doc>";
 
+        using var hashAlg = SHA256.Create();
+        var hash = hashAlg.ComputeHash(Encoding.UTF8.GetBytes(strC14N));
+
         var sb = new StringBuilder();
         foreach (var encodingInfo in encodingInfos)
         {
-            var codePage = encodingInfo.CodePage;
             var encoding = encodingInfo.GetEncoding();
             var bytes = encoding.GetBytes(str);
 
             try
             {
                 sb.Clear();
-                Write(sb, new MemoryStream(bytes), encoding);
+                hashAlg.Initialize();
 
+                Write(sb, hashAlg, new MemoryStream(bytes), encoding);
+                
                 Assert.That(sb.ToString(), Is.EqualTo(strC14N));
+                Assert.That(hashAlg.Hash.AsSpan().SequenceEqual(hash), Is.True);
             }
             catch
             {
-                Console.WriteLine(codePage);
+                Console.WriteLine(encodingInfo.CodePage);
                 throw;
             }
         }
     }
 
-    private static void Write(StringBuilder sb, Stream stream, Encoding encoding)
+    private static void Write(StringBuilder sb, HashAlgorithm hashAlg, Stream stream, Encoding encoding)
     {
         var context = new XmlParserContext(null, null, null, default, enc: encoding);
 
         var xml = new ExcCanonicalXml(stream, false, null, XmlResolverHelper.GetThrowingResolver(), context);
 
-        xml.Write(sb);
+        xml.Write(sb); 
+        
+        stream.Position = 0;
+        xml.WriteHash(hashAlg);
+
+        hashAlg.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
     }
 }
