@@ -43,27 +43,20 @@ internal sealed class CanonicalXmlProcessingInstruction : XmlProcessingInstructi
             return;
 
         var utf8 = Encoding.UTF8;
-        byte[] rgbData;
         if (docPos == DocPosition.AfterRootElement)
         {
-            rgbData = utf8.GetBytes("(char) 10");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
         }
-        rgbData = utf8.GetBytes("<?");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes(Name);
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+        hash.Append(utf8.GetBytes("<?"));
+        hash.Append(utf8.GetBytes(Name));
         if (Value != null && Value.Length > 0)
         {
-            rgbData = utf8.GetBytes(" " + Value);
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes(" " + Value));
         }
-        rgbData = utf8.GetBytes("?>");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+        hash.Append(utf8.GetBytes("?>"));
         if (docPos == DocPosition.BeforeRootElement)
         {
-            rgbData = utf8.GetBytes("(char) 10");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
         }
     }
 }

@@ -48,19 +48,14 @@ internal sealed class CanonicalXmlComment : XmlComment, ICanonicalizableNode
             return;
 
         var utf8 = Encoding.UTF8;
-        byte[] rgbData = utf8.GetBytes("(char) 10");
         if (docPos == DocPosition.AfterRootElement)
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes("<!--");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes(Value);
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes("-->");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
+        hash.Append(utf8.GetBytes("<!--"));
+        hash.Append(utf8.GetBytes(Value));
+        hash.Append(utf8.GetBytes("-->"));
         if (docPos == DocPosition.BeforeRootElement)
         {
-            rgbData = utf8.GetBytes("(char) 10");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
         }
     }
 }

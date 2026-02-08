@@ -31,8 +31,7 @@ internal sealed class CanonicalXmlWhitespace : XmlWhitespace, ICanonicalizableNo
     {
         if (IsInNodeSet && docPos == DocPosition.InRootElement)
         {
-            byte[] rgbData = Encoding.UTF8.GetBytes(Utils.EscapeWhitespaceData(Value));
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeWhitespaceData(Value)));
         }
     }
 }

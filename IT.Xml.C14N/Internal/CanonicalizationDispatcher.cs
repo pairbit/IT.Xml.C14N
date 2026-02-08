@@ -11,9 +11,9 @@ internal static class CanonicalizationDispatcher
 {
     public static void Write(XmlNode node, StringBuilder strBuilder, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
-        if (node is ICanonicalizableNode)
+        if (node is ICanonicalizableNode cnode)
         {
-            ((ICanonicalizableNode)node).Write(strBuilder, docPos, anc);
+            cnode.Write(strBuilder, docPos, anc);
         }
         else
         {
@@ -35,9 +35,9 @@ internal static class CanonicalizationDispatcher
 
     public static void WriteHash(XmlNode node, HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
-        if (node is ICanonicalizableNode)
+        if (node is ICanonicalizableNode cnode)
         {
-            ((ICanonicalizableNode)node).WriteHash(hash, docPos, anc);
+            cnode.WriteHash(hash, docPos, anc);
         }
         else
         {

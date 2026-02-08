@@ -31,11 +31,16 @@ internal sealed class CanonicalXmlAttribute : XmlAttribute, ICanonicalizableNode
     public void WriteHash(HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
         var utf8 = Encoding.UTF8;
-        byte[] rgbData = utf8.GetBytes(" " + Name + "=\"");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes(Utils.EscapeAttributeValue(Value));
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes("\"");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+        hash.Append(utf8.GetBytes(" " + Name + "=\""));
+        hash.Append(utf8.GetBytes(Utils.EscapeAttributeValue(Value)));
+        hash.Append(utf8.GetBytes("\""));
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        var utf8 = Encoding.UTF8;
+        hash.Append(utf8.GetBytes(" " + Name + "=\""));
+        hash.Append(utf8.GetBytes(Utils.EscapeAttributeValue(Value)));
+        hash.Append(utf8.GetBytes("\""));
     }
 }

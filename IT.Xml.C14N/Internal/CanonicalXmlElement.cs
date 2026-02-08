@@ -99,7 +99,6 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
         SortedList nsListToRender = new SortedList(new NamespaceSortOrder());
         SortedList attrListToRender = new SortedList(new AttributeSortOrder());
         var utf8 = Encoding.UTF8;
-        byte[] rgbData;
 
         XmlAttributeCollection attrList = Attributes;
         if (attrList != null)
@@ -135,8 +134,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
         if (IsInNodeSet)
         {
             anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
-            rgbData = utf8.GetBytes("<" + Name);
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("<" + Name));
             foreach (object attr in nsListToRender.GetKeyList())
             {
                 (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
@@ -145,8 +143,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
             {
                 (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
             }
-            rgbData = utf8.GetBytes(">");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes(">"));
         }
 
         anc.EnterElementContext();
@@ -163,8 +160,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
 
         if (IsInNodeSet)
         {
-            rgbData = utf8.GetBytes("</" + Name + ">");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("</" + Name + ">"));
         }
     }
 }
