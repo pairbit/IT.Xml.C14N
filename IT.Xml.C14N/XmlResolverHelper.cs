@@ -4,11 +4,11 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace IT.Xml.C14N.Internal;
+namespace IT.Xml.C14N;
 
-internal static class XmlResolverHelper
+public static class XmlResolverHelper
 {
-    internal static XmlResolver GetThrowingResolver()
+    public static XmlResolver GetThrowingResolver()
     {
 #if NET7_0_OR_GREATER
         return XmlResolver.ThrowingResolver;
