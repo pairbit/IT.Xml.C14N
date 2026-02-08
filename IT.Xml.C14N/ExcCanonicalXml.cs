@@ -1,17 +1,18 @@
+using IT.Xml.C14N.Internal;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 
-namespace IT.Xml.C14N.Internal;
+namespace IT.Xml.C14N;
 
-internal sealed class ExcCanonicalXml
+public sealed class ExcCanonicalXml
 {
     private readonly CanonicalXmlDocument _c14nDoc;
     private readonly ExcAncestralNamespaceContextManager _ancMgr;
 
-    internal ExcCanonicalXml(Stream inputStream, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver, string strBaseUri)
+    public ExcCanonicalXml(Stream inputStream, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver, string strBaseUri)
     {
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
@@ -22,7 +23,7 @@ internal sealed class ExcCanonicalXml
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    internal ExcCanonicalXml(XmlDocument document, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
+    public ExcCanonicalXml(XmlDocument document, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
     {
         if (document == null)
             throw new ArgumentNullException(nameof(document));
@@ -33,7 +34,7 @@ internal sealed class ExcCanonicalXml
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    internal ExcCanonicalXml(XmlNodeList nodeList, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
+    public ExcCanonicalXml(XmlNodeList nodeList, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
     {
         if (nodeList == null)
             throw new ArgumentNullException(nameof(nodeList));
@@ -50,7 +51,12 @@ internal sealed class ExcCanonicalXml
         MarkInclusionStateForNodes(nodeList, doc, _c14nDoc);
     }
 
-    internal byte[] GetBytes()
+    public void Write(StringBuilder sb)
+    {
+        _c14nDoc.Write(sb, DocPosition.BeforeRootElement, _ancMgr);
+    }
+
+    public byte[] GetBytes()
     {
         StringBuilder sb = new StringBuilder();
         _c14nDoc.Write(sb, DocPosition.BeforeRootElement, _ancMgr);
@@ -58,7 +64,7 @@ internal sealed class ExcCanonicalXml
         return utf8.GetBytes(sb.ToString());
     }
 
-    internal byte[] GetDigestedBytes(HashAlgorithm hash)
+    public byte[] GetDigestedBytes(HashAlgorithm hash)
     {
         _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
         hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
