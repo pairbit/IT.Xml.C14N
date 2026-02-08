@@ -42,7 +42,7 @@ internal sealed class CanonicalXmlProcessingInstruction : XmlProcessingInstructi
         if (!IsInNodeSet)
             return;
 
-        UTF8Encoding utf8 = new UTF8Encoding(false);
+        var utf8 = Encoding.UTF8;
         byte[] rgbData;
         if (docPos == DocPosition.AfterRootElement)
         {

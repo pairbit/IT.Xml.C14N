@@ -98,7 +98,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
         Hashtable nsLocallyDeclared = new Hashtable();
         SortedList nsListToRender = new SortedList(new NamespaceSortOrder());
         SortedList attrListToRender = new SortedList(new AttributeSortOrder());
-        UTF8Encoding utf8 = new UTF8Encoding(false);
+        var utf8 = Encoding.UTF8;
         byte[] rgbData;
 
         XmlAttributeCollection attrList = Attributes;

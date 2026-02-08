@@ -31,8 +31,7 @@ internal sealed class CanonicalXmlSignificantWhitespace : XmlSignificantWhitespa
     {
         if (IsInNodeSet && docPos == DocPosition.InRootElement)
         {
-            UTF8Encoding utf8 = new UTF8Encoding(false);
-            byte[] rgbData = utf8.GetBytes(Utils.EscapeWhitespaceData(Value));
+            byte[] rgbData = Encoding.UTF8.GetBytes(Utils.EscapeWhitespaceData(Value));
             hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
         }
     }

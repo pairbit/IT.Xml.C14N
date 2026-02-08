@@ -19,9 +19,11 @@ internal class ExcCanonicalXmlTest
 
         var str = "<Doc   a  =  '1'  ><!--comment-->Text</Doc >";
         var strC14N = "<Doc a=\"1\">Text</Doc>";
+        var sha256 = "fmcmAi1fbHYhWMToN0wsnUdMfN37CC4SmH8l63to6ZU=";
 
         using var hashAlg = SHA256.Create();
         var hash = hashAlg.ComputeHash(Encoding.UTF8.GetBytes(strC14N));
+        Assert.That(Convert.ToBase64String(hash), Is.EqualTo(sha256));
 
         var sb = new StringBuilder();
         foreach (var encodingInfo in encodingInfos)
@@ -54,8 +56,6 @@ internal class ExcCanonicalXmlTest
         var xml = new ExcCanonicalXml(stream, false, null, XmlResolverHelper.GetThrowingResolver(), context);
 
         xml.Write(sb); 
-        
-        stream.Position = 0;
         xml.WriteHash(hashAlg);
 
         hashAlg.TransformFinalBlock(Array.Empty<byte>(), 0, 0);

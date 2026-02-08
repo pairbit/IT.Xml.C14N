@@ -31,8 +31,7 @@ internal sealed class CanonicalXmlText : XmlText, ICanonicalizableNode
     {
         if (IsInNodeSet)
         {
-            UTF8Encoding utf8 = new UTF8Encoding(false);
-            byte[] rgbData = utf8.GetBytes(Utils.EscapeTextData(Value));
+            byte[] rgbData = Encoding.UTF8.GetBytes(Utils.EscapeTextData(Value));
             hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
         }
     }

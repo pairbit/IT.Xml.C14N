@@ -47,7 +47,7 @@ internal sealed class CanonicalXmlComment : XmlComment, ICanonicalizableNode
         if (!IsInNodeSet || !IncludeComments)
             return;
 
-        UTF8Encoding utf8 = new UTF8Encoding(false);
+        var utf8 = Encoding.UTF8;
         byte[] rgbData = utf8.GetBytes("(char) 10");
         if (docPos == DocPosition.AfterRootElement)
             hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);

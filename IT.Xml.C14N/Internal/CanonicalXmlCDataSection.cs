@@ -29,7 +29,7 @@ internal sealed class CanonicalXmlCDataSection : XmlCDataSection, ICanonicalizab
     {
         if (IsInNodeSet)
         {
-            UTF8Encoding utf8 = new UTF8Encoding(false);
+            var utf8 = Encoding.UTF8;
             byte[] rgbData = utf8.GetBytes(Utils.EscapeCData(Data));
             hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
         }

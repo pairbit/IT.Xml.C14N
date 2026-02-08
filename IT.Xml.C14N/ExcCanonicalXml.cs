@@ -76,8 +76,7 @@ public sealed class ExcCanonicalXml
     {
         StringBuilder sb = new StringBuilder();
         _c14nDoc.Write(sb, DocPosition.BeforeRootElement, _ancMgr);
-        UTF8Encoding utf8 = new UTF8Encoding(false);
-        return utf8.GetBytes(sb.ToString());
+        return Encoding.UTF8.GetBytes(sb.ToString());
     }
 
     public byte[] GetDigestedBytes(HashAlgorithm hash)
