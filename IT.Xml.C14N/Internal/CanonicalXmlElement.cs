@@ -205,7 +205,8 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
         if (IsInNodeSet)
         {
             anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
-            hash.Append(utf8.GetBytes("<" + Name));
+            hash.Append((byte)'<');
+            hash.Append(utf8.GetBytes(Name));
             foreach (object attr in nsListToRender.GetKeyList())
             {
                 (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
@@ -214,7 +215,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
             {
                 (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
             }
-            hash.Append(utf8.GetBytes(">"));
+            hash.Append((byte)'>');
         }
 
         anc.EnterElementContext();
@@ -231,7 +232,9 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
 
         if (IsInNodeSet)
         {
-            hash.Append(utf8.GetBytes("</" + Name + ">"));
+            hash.Append("</"u8);
+            hash.Append(utf8.GetBytes(Name));
+            hash.Append((byte)'>');
         }
     }
 }
