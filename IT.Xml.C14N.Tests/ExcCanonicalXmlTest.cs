@@ -37,7 +37,7 @@ internal class ExcCanonicalXmlTest
                 hashAlg.Initialize();
 
                 Write(sb, hashAlg, new MemoryStream(bytes), encoding);
-                
+
                 Assert.That(sb.ToString(), Is.EqualTo(strC14N));
                 Assert.That(hashAlg.Hash.AsSpan().SequenceEqual(hash), Is.True);
             }
@@ -55,9 +55,22 @@ internal class ExcCanonicalXmlTest
 
         var xml = new ExcCanonicalXml(stream, false, null, XmlResolverHelper.GetThrowingResolver(), context);
 
-        xml.Write(sb); 
+        xml.Write(sb);
         xml.WriteHash(hashAlg);
 
         hashAlg.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+    }
+
+    class GOST256 : IT.Hashing.Gost.Gost3411_2012_256Digest, IIncrementalHashAlgorithm
+    {
+        public void Append(byte data)
+        {
+            Update(data);
+        }
+
+        public void Append(ReadOnlySpan<byte> data)
+        {
+            BlockUpdate(data);
+        }
     }
 }

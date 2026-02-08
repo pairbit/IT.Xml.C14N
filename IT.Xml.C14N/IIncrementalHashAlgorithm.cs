@@ -4,5 +4,7 @@ namespace IT.Xml.C14N;
 
 public interface IIncrementalHashAlgorithm
 {
-    void Append(ReadOnlySpan<byte> span);
+    void Append(byte data);
+
+    void Append(ReadOnlySpan<byte> data);
 }
