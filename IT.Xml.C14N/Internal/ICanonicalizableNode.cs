@@ -15,4 +15,5 @@ internal interface ICanonicalizableNode
 
     void Write(StringBuilder strBuilder, DocPosition docPos, AncestralNamespaceContextManager anc);
     void WriteHash(HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc);
+    void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc);
 }

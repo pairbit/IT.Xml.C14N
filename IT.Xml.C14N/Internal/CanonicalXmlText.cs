@@ -34,4 +34,12 @@ internal sealed class CanonicalXmlText : XmlText, ICanonicalizableNode
             hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeTextData(Value)));
         }
     }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (IsInNodeSet)
+        {
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeTextData(Value)));
+        }
+    }
 }

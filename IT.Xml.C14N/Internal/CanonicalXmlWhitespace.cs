@@ -34,4 +34,12 @@ internal sealed class CanonicalXmlWhitespace : XmlWhitespace, ICanonicalizableNo
             hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeWhitespaceData(Value)));
         }
     }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (IsInNodeSet && docPos == DocPosition.InRootElement)
+        {
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeWhitespaceData(Value)));
+        }
+    }
 }

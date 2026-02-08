@@ -72,6 +72,11 @@ public sealed class ExcCanonicalXml
         _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
     }
 
+    public void AppendHash(IIncrementalHashAlgorithm hash)
+    {
+        _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
+    }
+
     public byte[] GetBytes()
     {
         StringBuilder sb = new StringBuilder();

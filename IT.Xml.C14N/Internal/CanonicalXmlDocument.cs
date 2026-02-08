@@ -59,6 +59,23 @@ internal sealed class CanonicalXmlDocument : XmlDocument, ICanonicalizableNode
         }
     }
 
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        docPos = DocPosition.BeforeRootElement;
+        foreach (XmlNode childNode in ChildNodes)
+        {
+            if (childNode.NodeType == XmlNodeType.Element)
+            {
+                CanonicalizationDispatcher.WriteHash(childNode, hash, DocPosition.InRootElement, anc);
+                docPos = DocPosition.AfterRootElement;
+            }
+            else
+            {
+                CanonicalizationDispatcher.WriteHash(childNode, hash, docPos, anc);
+            }
+        }
+    }
+
     public override XmlElement CreateElement(string prefix, string localName, string namespaceURI)
     {
         return new CanonicalXmlElement(prefix, localName, namespaceURI, this, _defaultNodeSetInclusionState);

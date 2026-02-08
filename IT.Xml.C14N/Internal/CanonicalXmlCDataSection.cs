@@ -32,4 +32,12 @@ internal sealed class CanonicalXmlCDataSection : XmlCDataSection, ICanonicalizab
             hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeCData(Data)));
         }
     }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (IsInNodeSet)
+        {
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeCData(Data)));
+        }
+    }
 }
