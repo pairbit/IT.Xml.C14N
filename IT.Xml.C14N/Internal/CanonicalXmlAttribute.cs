@@ -39,8 +39,10 @@ internal sealed class CanonicalXmlAttribute : XmlAttribute, ICanonicalizableNode
     public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
         var utf8 = Encoding.UTF8;
-        hash.Append(utf8.GetBytes(" " + Name + "=\""));
+        hash.Append((byte)' ');
+        hash.Append(utf8.GetBytes(Name));
+        hash.Append("=\""u8);
         hash.Append(utf8.GetBytes(Utils.EscapeAttributeValue(Value)));
-        hash.Append(utf8.GetBytes("\""));
+        hash.Append("\""u8);
     }
 }
