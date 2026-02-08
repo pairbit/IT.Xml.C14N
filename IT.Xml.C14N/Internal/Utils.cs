@@ -126,6 +126,13 @@ internal static class Utils
         }
     }
 
+    internal static XmlReader PreProcessStreamInput(Stream inputStream, XmlResolver xmlResolver, XmlParserContext inputContext)
+    {
+        XmlReaderSettings settings = GetSecureXmlReaderSettings(xmlResolver);
+        XmlReader reader = XmlReader.Create(inputStream, settings, inputContext);
+        return reader;
+    }
+
     internal static XmlReader PreProcessStreamInput(Stream inputStream, XmlResolver xmlResolver, string baseUri)
     {
         XmlReaderSettings settings = GetSecureXmlReaderSettings(xmlResolver);

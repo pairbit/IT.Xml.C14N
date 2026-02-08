@@ -12,6 +12,17 @@ public sealed class ExcCanonicalXml
     private readonly CanonicalXmlDocument _c14nDoc;
     private readonly ExcAncestralNamespaceContextManager _ancMgr;
 
+    public ExcCanonicalXml(Stream inputStream, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver, XmlParserContext inputContext)
+    {
+        if (inputStream == null)
+            throw new ArgumentNullException(nameof(inputStream));
+
+        _c14nDoc = new CanonicalXmlDocument(true, includeComments);
+        _c14nDoc.XmlResolver = resolver;
+        _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, inputContext));
+        _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
+    }
+
     public ExcCanonicalXml(Stream inputStream, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver, string strBaseUri)
     {
         if (inputStream == null)
