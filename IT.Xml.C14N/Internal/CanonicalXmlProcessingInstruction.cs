@@ -70,13 +70,14 @@ internal sealed class CanonicalXmlProcessingInstruction : XmlProcessingInstructi
         {
             hash.Append(utf8.GetBytes("(char) 10"));
         }
-        hash.Append(utf8.GetBytes("<?"));
+        hash.Append("<?"u8);
         hash.Append(utf8.GetBytes(Name));
         if (Value != null && Value.Length > 0)
         {
-            hash.Append(utf8.GetBytes(" " + Value));
+            hash.Append((byte)' ');
+            hash.Append(utf8.GetBytes(Value));
         }
-        hash.Append(utf8.GetBytes("?>"));
+        hash.Append("?>"u8);
         if (docPos == DocPosition.BeforeRootElement)
         {
             hash.Append(utf8.GetBytes("(char) 10"));
