@@ -7,13 +7,13 @@
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
-	<Description>Implementation of C14N XML Transform</Description>
+	<Description>XML Canonicalization</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/pairbit/IT.Xml.C14N</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
-	<Copyright>Ivan Tikhonov © 2023</Copyright>
-	<Version>2.0.0</Version>
+	<Copyright>Ivan Tikhonov © 2026</Copyright>
+	<Version>2.0.1</Version>
 	<PackageTags>Xml C14N</PackageTags>
 	<PackageReadmeFile>Readme.md</PackageReadmeFile>
 	<PackageIcon>Icon.png</PackageIcon>
