@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlText : XmlText, ICanonicalizableNode
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlText(string strData, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlText(string? strData, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(strData, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;

@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlProcessingInstruction : XmlProcessingInstructi
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlProcessingInstruction(string target, string data, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlProcessingInstruction(string target, string? data, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(target, data, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;

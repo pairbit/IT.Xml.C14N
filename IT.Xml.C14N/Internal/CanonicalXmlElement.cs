@@ -10,7 +10,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlElement(string prefix, string localName, string namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlElement(string? prefix, string localName, string? namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(prefix, localName, namespaceURI, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;
@@ -64,13 +64,13 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
             anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
 
             strBuilder.Append('<').Append(Name);
-            foreach (object attr in nsListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in nsListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).Write(strBuilder, docPos, anc);
+                attr.Write(strBuilder, docPos, anc);
             }
-            foreach (object attr in attrListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in attrListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).Write(strBuilder, docPos, anc);
+                attr.Write(strBuilder, docPos, anc);
             }
             strBuilder.Append('>');
         }
@@ -135,13 +135,13 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
         {
             anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
             hash.Append(utf8.GetBytes("<" + Name));
-            foreach (object attr in nsListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in nsListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
+                attr.WriteHash(hash, docPos, anc);
             }
-            foreach (object attr in attrListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in attrListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
+                attr.WriteHash(hash, docPos, anc);
             }
             hash.Append(utf8.GetBytes(">"));
         }
@@ -207,13 +207,13 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
             anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
             hash.Append((byte)'<');
             hash.Append(utf8.GetBytes(Name));
-            foreach (object attr in nsListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in nsListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
+                attr.WriteHash(hash, docPos, anc);
             }
-            foreach (object attr in attrListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in attrListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
+                attr.WriteHash(hash, docPos, anc);
             }
             hash.Append((byte)'>');
         }

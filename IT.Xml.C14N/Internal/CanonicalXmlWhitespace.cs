@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlWhitespace : XmlWhitespace, ICanonicalizableNo
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlWhitespace(string strData, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlWhitespace(string? strData, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(strData, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;

@@ -10,7 +10,7 @@ internal sealed class CanonicalXmlComment : XmlComment, ICanonicalizableNode
     private bool _isInNodeSet;
     private readonly bool _includeComments;
 
-    public CanonicalXmlComment(string comment, XmlDocument doc, bool defaultNodeSetInclusionState, bool includeComments)
+    public CanonicalXmlComment(string? comment, XmlDocument doc, bool defaultNodeSetInclusionState, bool includeComments)
         : base(comment, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;

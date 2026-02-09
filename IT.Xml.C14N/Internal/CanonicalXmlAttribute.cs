@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlAttribute : XmlAttribute, ICanonicalizableNode
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlAttribute(string prefix, string localName, string namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlAttribute(string? prefix, string localName, string? namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(prefix, localName, namespaceURI, doc)
     {
         IsInNodeSet = defaultNodeSetInclusionState;

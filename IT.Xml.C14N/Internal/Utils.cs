@@ -82,7 +82,7 @@ internal static class Utils
 
     internal static bool IsEmptyDefaultNamespaceNode(XmlNode n)
     {
-        return IsDefaultNamespaceNode(n) && n.Value.Length == 0;
+        return IsDefaultNamespaceNode(n) && n.Value.AsSpan().Length == 0;
     }
 
     internal static string GetNamespacePrefix(XmlAttribute a)
