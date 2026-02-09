@@ -12,35 +12,29 @@ public sealed class ExcCanonicalXml
     private readonly CanonicalXmlDocument _c14nDoc;
     private readonly ExcAncestralNamespaceContextManager _ancMgr;
 
-    public ExcCanonicalXml(Stream inputStream, XmlParserContext? inputContext = null, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
+    public ExcCanonicalXml(Stream stream, XmlParserContext? context = null, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
     {
-        if (inputStream == null)
-            throw new ArgumentNullException(nameof(inputStream));
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        if (resolver == null) resolver = XmlResolverHelper.GetThrowingResolver();
 
-        if (resolver == null)
-            resolver = XmlResolverHelper.GetThrowingResolver();
-        
         var settings = Utils.GetSecureXmlReaderSettings(resolver);
 
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
-        _c14nDoc.Load(XmlReader.Create(inputStream, settings, inputContext));
+        _c14nDoc.Load(XmlReader.Create(stream, settings, context));
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    public ExcCanonicalXml(Stream inputStream, string strBaseUri, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
+    public ExcCanonicalXml(Stream stream, string? baseUri, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
     {
-        if (inputStream == null)
-            throw new ArgumentNullException(nameof(inputStream));
-
-        if (resolver == null)
-            resolver = XmlResolverHelper.GetThrowingResolver();
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        if (resolver == null) resolver = XmlResolverHelper.GetThrowingResolver();
 
         var settings = Utils.GetSecureXmlReaderSettings(resolver);
 
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
-        _c14nDoc.Load(XmlReader.Create(inputStream, settings, strBaseUri));
+        _c14nDoc.Load(XmlReader.Create(stream, settings, baseUri));
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
