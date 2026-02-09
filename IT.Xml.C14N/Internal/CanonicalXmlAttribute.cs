@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlAttribute : XmlAttribute, ICanonicalizableNode
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlAttribute(string prefix, string localName, string namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlAttribute(string? prefix, string localName, string? namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(prefix, localName, namespaceURI, doc)
     {
         IsInNodeSet = defaultNodeSetInclusionState;
@@ -30,12 +30,19 @@ internal sealed class CanonicalXmlAttribute : XmlAttribute, ICanonicalizableNode
 
     public void WriteHash(HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
-        UTF8Encoding utf8 = new UTF8Encoding(false);
-        byte[] rgbData = utf8.GetBytes(" " + Name + "=\"");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes(Utils.EscapeAttributeValue(Value));
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes("\"");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+        var utf8 = Encoding.UTF8;
+        hash.Append(utf8.GetBytes(" " + Name + "=\""));
+        hash.Append(utf8.GetBytes(Utils.EscapeAttributeValue(Value)));
+        hash.Append(utf8.GetBytes("\""));
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        var utf8 = Encoding.UTF8;
+        hash.Append((byte)' ');
+        hash.Append(utf8.GetBytes(Name));
+        hash.Append("=\""u8);
+        hash.Append(utf8.GetBytes(Utils.EscapeAttributeValue(Value)));
+        hash.Append("\""u8);
     }
 }

@@ -8,7 +8,7 @@ namespace IT.Xml.C14N.Internal;
 internal sealed class CanonicalXmlCDataSection : XmlCDataSection, ICanonicalizableNode
 {
     private bool _isInNodeSet;
-    public CanonicalXmlCDataSection(string data, XmlDocument doc, bool defaultNodeSetInclusionState) : base(data, doc)
+    public CanonicalXmlCDataSection(string? data, XmlDocument doc, bool defaultNodeSetInclusionState) : base(data, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;
     }
@@ -29,9 +29,15 @@ internal sealed class CanonicalXmlCDataSection : XmlCDataSection, ICanonicalizab
     {
         if (IsInNodeSet)
         {
-            UTF8Encoding utf8 = new UTF8Encoding(false);
-            byte[] rgbData = utf8.GetBytes(Utils.EscapeCData(Data));
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeCData(Data)));
+        }
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (IsInNodeSet)
+        {
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeCData(Data)));
         }
     }
 }

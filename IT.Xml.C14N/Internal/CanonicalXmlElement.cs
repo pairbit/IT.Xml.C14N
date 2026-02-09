@@ -10,7 +10,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlElement(string prefix, string localName, string namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlElement(string? prefix, string localName, string? namespaceURI, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(prefix, localName, namespaceURI, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;
@@ -64,13 +64,13 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
             anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
 
             strBuilder.Append('<').Append(Name);
-            foreach (object attr in nsListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in nsListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).Write(strBuilder, docPos, anc);
+                attr.Write(strBuilder, docPos, anc);
             }
-            foreach (object attr in attrListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in attrListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).Write(strBuilder, docPos, anc);
+                attr.Write(strBuilder, docPos, anc);
             }
             strBuilder.Append('>');
         }
@@ -98,8 +98,7 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
         Hashtable nsLocallyDeclared = new Hashtable();
         SortedList nsListToRender = new SortedList(new NamespaceSortOrder());
         SortedList attrListToRender = new SortedList(new AttributeSortOrder());
-        UTF8Encoding utf8 = new UTF8Encoding(false);
-        byte[] rgbData;
+        var utf8 = Encoding.UTF8;
 
         XmlAttributeCollection attrList = Attributes;
         if (attrList != null)
@@ -135,18 +134,16 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
         if (IsInNodeSet)
         {
             anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
-            rgbData = utf8.GetBytes("<" + Name);
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-            foreach (object attr in nsListToRender.GetKeyList())
+            hash.Append(utf8.GetBytes("<" + Name));
+            foreach (CanonicalXmlAttribute attr in nsListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
+                attr.WriteHash(hash, docPos, anc);
             }
-            foreach (object attr in attrListToRender.GetKeyList())
+            foreach (CanonicalXmlAttribute attr in attrListToRender.GetKeyList())
             {
-                (attr as CanonicalXmlAttribute).WriteHash(hash, docPos, anc);
+                attr.WriteHash(hash, docPos, anc);
             }
-            rgbData = utf8.GetBytes(">");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes(">"));
         }
 
         anc.EnterElementContext();
@@ -163,8 +160,81 @@ internal sealed class CanonicalXmlElement : XmlElement, ICanonicalizableNode
 
         if (IsInNodeSet)
         {
-            rgbData = utf8.GetBytes("</" + Name + ">");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("</" + Name + ">"));
+        }
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        Hashtable nsLocallyDeclared = new Hashtable();
+        SortedList nsListToRender = new SortedList(new NamespaceSortOrder());
+        SortedList attrListToRender = new SortedList(new AttributeSortOrder());
+        var utf8 = Encoding.UTF8;
+
+        XmlAttributeCollection attrList = Attributes;
+        if (attrList != null)
+        {
+            foreach (XmlAttribute attr in attrList)
+            {
+                if (((CanonicalXmlAttribute)attr).IsInNodeSet || Utils.IsNamespaceNode(attr) || Utils.IsXmlNamespaceNode(attr))
+                {
+                    if (Utils.IsNamespaceNode(attr))
+                    {
+                        anc.TrackNamespaceNode(attr, nsListToRender, nsLocallyDeclared);
+                    }
+                    else if (Utils.IsXmlNamespaceNode(attr))
+                    {
+                        anc.TrackXmlNamespaceNode(attr, nsListToRender, attrListToRender, nsLocallyDeclared);
+                    }
+                    else if (IsInNodeSet)
+                    {
+                        attrListToRender.Add(attr, null);
+                    }
+                }
+            }
+        }
+
+        if (!Utils.IsCommittedNamespace(this, Prefix, NamespaceURI))
+        {
+            string name = Prefix.Length > 0 ? "xmlns" + ":" + Prefix : "xmlns";
+            XmlAttribute nsattrib = OwnerDocument.CreateAttribute(name);
+            nsattrib.Value = NamespaceURI;
+            anc.TrackNamespaceNode(nsattrib, nsListToRender, nsLocallyDeclared);
+        }
+
+        if (IsInNodeSet)
+        {
+            anc.GetNamespacesToRender(this, attrListToRender, nsListToRender, nsLocallyDeclared);
+            hash.Append((byte)'<');
+            hash.Append(utf8.GetBytes(Name));
+            foreach (CanonicalXmlAttribute attr in nsListToRender.GetKeyList())
+            {
+                attr.WriteHash(hash, docPos, anc);
+            }
+            foreach (CanonicalXmlAttribute attr in attrListToRender.GetKeyList())
+            {
+                attr.WriteHash(hash, docPos, anc);
+            }
+            hash.Append((byte)'>');
+        }
+
+        anc.EnterElementContext();
+        anc.LoadUnrenderedNamespaces(nsLocallyDeclared);
+        anc.LoadRenderedNamespaces(nsListToRender);
+
+        XmlNodeList childNodes = ChildNodes;
+        foreach (XmlNode childNode in childNodes)
+        {
+            CanonicalizationDispatcher.WriteHash(childNode, hash, docPos, anc);
+        }
+
+        anc.ExitElementContext();
+
+        if (IsInNodeSet)
+        {
+            hash.Append("</"u8);
+            hash.Append(utf8.GetBytes(Name));
+            hash.Append((byte)'>');
         }
     }
 }

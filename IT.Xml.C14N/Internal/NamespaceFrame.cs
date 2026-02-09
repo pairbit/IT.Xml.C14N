@@ -20,7 +20,7 @@ internal sealed class NamespaceFrame
 
     internal XmlAttribute GetRendered(string nsPrefix)
     {
-        return (XmlAttribute)_rendered[nsPrefix];
+        return (XmlAttribute)_rendered[nsPrefix]!;
     }
 
     internal void AddUnrendered(XmlAttribute attr)
@@ -30,7 +30,7 @@ internal sealed class NamespaceFrame
 
     internal XmlAttribute GetUnrendered(string nsPrefix)
     {
-        return (XmlAttribute)_unrendered[nsPrefix];
+        return (XmlAttribute)_unrendered[nsPrefix]!;
     }
 
     internal Hashtable GetUnrendered()

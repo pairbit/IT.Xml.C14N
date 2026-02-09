@@ -3,17 +3,17 @@
   <PropertyGroup>
 	<TargetFrameworks>netstandard2.0;netstandard2.1;net8.0</TargetFrameworks>
 	<LangVersion>latest</LangVersion>
-	<!--<Nullable>enable</Nullable>-->
+	<Nullable>enable</Nullable>
 	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	<Company />
-	<Description>Implementation of C14N XML Transform</Description>
+	<Description>XML Canonicalization</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<RepositoryUrl>https://github.com/pairbit/IT.Xml.C14N</RepositoryUrl>
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<Authors>Ivan Tikhonov</Authors>
-	<Copyright>Ivan Tikhonov © 2023</Copyright>
-	<Version>2.0.0</Version>
+	<Copyright>Ivan Tikhonov © 2026</Copyright>
+	<Version>2.0.1</Version>
 	<PackageTags>Xml C14N</PackageTags>
 	<PackageReadmeFile>Readme.md</PackageReadmeFile>
 	<PackageIcon>Icon.png</PackageIcon>
@@ -31,9 +31,13 @@
     <None Include="Readme.md" Pack="true" PackagePath="\" />
     <None Include="..\Icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
-	
+
+  <ItemGroup Condition="$(TargetFramework) == 'netstandard2.0'">
+    <PackageReference Include="System.Memory" Version="4.6.3" />
+  </ItemGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

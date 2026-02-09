@@ -1,39 +1,58 @@
+using IT.Xml.C14N.Internal;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml;
 
-namespace IT.Xml.C14N.Internal;
+namespace IT.Xml.C14N;
 
-internal sealed class ExcCanonicalXml
+public sealed class CanonicalXml
 {
     private readonly CanonicalXmlDocument _c14nDoc;
-    private readonly ExcAncestralNamespaceContextManager _ancMgr;
+    private readonly C14NAncestralNamespaceContextManager _ancMgr;
 
-    internal ExcCanonicalXml(Stream inputStream, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver, string strBaseUri)
+    public CanonicalXml(Stream stream, XmlParserContext? context = null, XmlResolver? resolver = null, bool includeComments = false)
     {
-        if (inputStream == null)
-            throw new ArgumentNullException(nameof(inputStream));
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        if (resolver == null) resolver = XmlResolverHelper.GetThrowingResolver();
+
+        var settings = Utils.GetSecureXmlReaderSettings(resolver);
 
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
-        _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, strBaseUri));
-        _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
+        _c14nDoc.Load(XmlReader.Create(stream, settings, context));
+        _ancMgr = new C14NAncestralNamespaceContextManager();
     }
 
-    internal ExcCanonicalXml(XmlDocument document, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
+    public CanonicalXml(Stream stream, string? baseUri, XmlResolver? resolver = null, bool includeComments = false)
+    {
+        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        if (resolver == null) resolver = XmlResolverHelper.GetThrowingResolver();
+
+        var settings = Utils.GetSecureXmlReaderSettings(resolver);
+
+        _c14nDoc = new CanonicalXmlDocument(true, includeComments);
+        _c14nDoc.XmlResolver = resolver;
+        _c14nDoc.Load(XmlReader.Create(stream, settings, baseUri));
+        _ancMgr = new C14NAncestralNamespaceContextManager();
+    }
+
+    public CanonicalXml(XmlDocument document, XmlResolver? resolver = null, bool includeComments = false)
     {
         if (document == null)
             throw new ArgumentNullException(nameof(document));
 
+        if (resolver == null)
+            resolver = XmlResolverHelper.GetThrowingResolver();
+
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
         _c14nDoc.Load(new XmlNodeReader(document));
-        _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
+        _ancMgr = new C14NAncestralNamespaceContextManager();
     }
 
-    internal ExcCanonicalXml(XmlNodeList nodeList, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
+    public CanonicalXml(XmlNodeList nodeList, XmlResolver? resolver = null, bool includeComments = false)
     {
         if (nodeList == null)
             throw new ArgumentNullException(nameof(nodeList));
@@ -42,30 +61,30 @@ internal sealed class ExcCanonicalXml
         if (doc == null)
             throw new ArgumentException(nameof(nodeList));
 
+        if (resolver == null)
+            resolver = XmlResolverHelper.GetThrowingResolver();
+
         _c14nDoc = new CanonicalXmlDocument(false, includeComments);
         _c14nDoc.XmlResolver = resolver;
         _c14nDoc.Load(new XmlNodeReader(doc));
-        _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
+        _ancMgr = new C14NAncestralNamespaceContextManager();
 
         MarkInclusionStateForNodes(nodeList, doc, _c14nDoc);
     }
 
-    internal byte[] GetBytes()
+    public void Write(StringBuilder sb)
     {
-        StringBuilder sb = new StringBuilder();
         _c14nDoc.Write(sb, DocPosition.BeforeRootElement, _ancMgr);
-        UTF8Encoding utf8 = new UTF8Encoding(false);
-        return utf8.GetBytes(sb.ToString());
     }
 
-    internal byte[] GetDigestedBytes(HashAlgorithm hash)
+    public void WriteHash(HashAlgorithm hash)
     {
         _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
-        hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-        byte[] res = (byte[])hash.Hash.Clone();
-        // reinitialize the hash so it is still usable after the call
-        hash.Initialize();
-        return res;
+    }
+
+    public void AppendHash(IIncrementalHashAlgorithm hash)
+    {
+        _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
     }
 
     private static void MarkInclusionStateForNodes(XmlNodeList nodeList, XmlDocument inputRoot, XmlDocument root)
@@ -78,8 +97,8 @@ internal sealed class ExcCanonicalXml
 
         do
         {
-            XmlNode currentNode = elementList[index];
-            XmlNode currentNodeCanonical = elementListCanonical[index];
+            XmlNode currentNode = (XmlNode)elementList[index]!;
+            XmlNode currentNodeCanonical = (XmlNode)elementListCanonical[index]!;
             XmlNodeList childNodes = currentNode.ChildNodes;
             XmlNodeList childNodesCanonical = currentNodeCanonical.ChildNodes;
             for (int i = 0; i < childNodes.Count; i++)
@@ -89,17 +108,17 @@ internal sealed class ExcCanonicalXml
 
                 if (Utils.NodeInList(childNodes[i], nodeList))
                 {
-                    MarkNodeAsIncluded(childNodesCanonical[i]);
+                    MarkNodeAsIncluded(childNodesCanonical[i]!);
                 }
 
-                XmlAttributeCollection attribNodes = childNodes[i].Attributes;
+                XmlAttributeCollection attribNodes = childNodes[i]!.Attributes;
                 if (attribNodes != null)
                 {
                     for (int j = 0; j < attribNodes.Count; j++)
                     {
                         if (Utils.NodeInList(attribNodes[j], nodeList))
                         {
-                            MarkNodeAsIncluded(childNodesCanonical[i].Attributes.Item(j));
+                            MarkNodeAsIncluded(childNodesCanonical[i]!.Attributes!.Item(j)!);
                         }
                     }
                 }
@@ -110,7 +129,7 @@ internal sealed class ExcCanonicalXml
 
     private static void MarkNodeAsIncluded(XmlNode node)
     {
-        if (node is ICanonicalizableNode)
-            ((ICanonicalizableNode)node).IsInNodeSet = true;
+        if (node is ICanonicalizableNode cnode)
+            cnode.IsInNodeSet = true;
     }
 }

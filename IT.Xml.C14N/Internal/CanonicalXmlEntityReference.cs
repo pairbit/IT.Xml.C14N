@@ -32,4 +32,10 @@ internal sealed class CanonicalXmlEntityReference : XmlEntityReference, ICanonic
         if (IsInNodeSet)
             CanonicalizationDispatcher.WriteHashGenericNode(this, hash, docPos, anc);
     }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (IsInNodeSet)
+            CanonicalizationDispatcher.WriteHashGenericNode(this, hash, docPos, anc);
+    }
 }

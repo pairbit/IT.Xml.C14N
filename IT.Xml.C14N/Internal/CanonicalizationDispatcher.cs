@@ -11,9 +11,9 @@ internal static class CanonicalizationDispatcher
 {
     public static void Write(XmlNode node, StringBuilder strBuilder, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
-        if (node is ICanonicalizableNode)
+        if (node is ICanonicalizableNode cnode)
         {
-            ((ICanonicalizableNode)node).Write(strBuilder, docPos, anc);
+            cnode.Write(strBuilder, docPos, anc);
         }
         else
         {
@@ -35,9 +35,21 @@ internal static class CanonicalizationDispatcher
 
     public static void WriteHash(XmlNode node, HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
-        if (node is ICanonicalizableNode)
+        if (node is ICanonicalizableNode cnode)
         {
-            ((ICanonicalizableNode)node).WriteHash(hash, docPos, anc);
+            cnode.WriteHash(hash, docPos, anc);
+        }
+        else
+        {
+            WriteHashGenericNode(node, hash, docPos, anc);
+        }
+    }
+
+    public static void WriteHash(XmlNode node, IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (node is ICanonicalizableNode cnode)
+        {
+            cnode.WriteHash(hash, docPos, anc);
         }
         else
         {
@@ -46,6 +58,18 @@ internal static class CanonicalizationDispatcher
     }
 
     public static void WriteHashGenericNode(XmlNode node, HashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (node == null)
+            throw new ArgumentNullException(nameof(node));
+
+        XmlNodeList childNodes = node.ChildNodes;
+        foreach (XmlNode childNode in childNodes)
+        {
+            WriteHash(childNode, hash, docPos, anc);
+        }
+    }
+
+    public static void WriteHashGenericNode(XmlNode node, IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
     {
         if (node == null)
             throw new ArgumentNullException(nameof(node));
