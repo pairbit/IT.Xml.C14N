@@ -1,5 +1,4 @@
-﻿using IT.Hashing.Gost.Native;
-using System;
+﻿using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,16 +19,22 @@ internal class ExcCanonicalXmlTest
 
         var str = "<Doc   a  =  '1'  ><!--comment-->Text</Doc >";
         var strC14N = "<Doc a=\"1\">Text</Doc>";
-        //var sha256 = "fmcmAi1fbHYhWMToN0wsnUdMfN37CC4SmH8l63to6ZU=";
+        var sha256 = "fmcmAi1fbHYhWMToN0wsnUdMfN37CC4SmH8l63to6ZU=";
         var gost256 = "da2KtPq2EsLzHE8ZJTJiqlWpz0x+tvTuxJgcN9t4Aas=";
 
-        var incHash = new GOST256();
-        using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
+        var bytesC14N = Encoding.UTF8.GetBytes(strC14N);
 
-        var hash = hashAlg.ComputeHash(Encoding.UTF8.GetBytes(strC14N));
-        Assert.That(Convert.ToBase64String(hash), Is.EqualTo(gost256));
+        using var shaAlg = SHA256.Create();
+        var shaHash = shaAlg.ComputeHash(bytesC14N);
+        Assert.That(Convert.ToBase64String(shaHash), Is.EqualTo(sha256));
 
-        var gostHash = new byte[incHash.GetDigestSize()];
+        var gostAlg = new GOST256();
+        var gostHash = new byte[gostAlg.GetDigestSize()];
+        gostAlg.Append(bytesC14N);
+        gostAlg.DoFinal(gostHash);
+        Assert.That(Convert.ToBase64String(gostHash), Is.EqualTo(gost256));
+
+        var gostHashCalc = new byte[gostAlg.GetDigestSize()];
         var sb = new StringBuilder();
         foreach (var encodingInfo in encodingInfos)
         {
@@ -39,16 +44,16 @@ internal class ExcCanonicalXmlTest
             try
             {
                 sb.Clear();
-                hashAlg.Initialize();
-                gostHash.AsSpan().Clear();
+                shaAlg.Initialize();
+                gostHashCalc.AsSpan().Clear();
 
-                Write(sb, hashAlg, incHash, new MemoryStream(bytes), encoding);
+                Write(sb, shaAlg, gostAlg, new MemoryStream(bytes), encoding);
 
                 Assert.That(sb.ToString(), Is.EqualTo(strC14N));
-                Assert.That(hashAlg.Hash.AsSpan().SequenceEqual(hash), Is.True);
-                
-                incHash.DoFinal(gostHash);
-                Assert.That(gostHash.AsSpan().SequenceEqual(hash), Is.True);
+                Assert.That(shaAlg.Hash.AsSpan().SequenceEqual(shaHash), Is.True);
+
+                gostAlg.DoFinal(gostHashCalc);
+                Assert.That(gostHashCalc.AsSpan().SequenceEqual(gostHash), Is.True);
             }
             catch
             {
