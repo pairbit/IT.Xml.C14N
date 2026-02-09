@@ -26,9 +26,9 @@ internal static class Utils
         return false;
     }
 
-    internal static string GetAttribute(XmlElement element, string localName, string namespaceURI)
+    internal static string? GetAttribute(XmlElement element, string localName, string namespaceURI)
     {
-        string s = element.HasAttribute(localName) ? element.GetAttribute(localName) : null;
+        string? s = element.HasAttribute(localName) ? element.GetAttribute(localName) : null;
         if (s == null && element.HasAttribute(localName, namespaceURI))
             s = element.GetAttribute(localName, namespaceURI);
         return s;
@@ -39,12 +39,12 @@ internal static class Utils
         return element.HasAttribute(localName) || element.HasAttribute(localName, namespaceURI);
     }
 
-    internal static bool VerifyAttributes(XmlElement element, string expectedAttrName)
+    internal static bool VerifyAttributes(XmlElement element, string? expectedAttrName)
     {
         return VerifyAttributes(element, expectedAttrName == null ? null : new string[] { expectedAttrName });
     }
 
-    internal static bool VerifyAttributes(XmlElement element, string[] expectedAttrNames)
+    internal static bool VerifyAttributes(XmlElement element, string[]? expectedAttrNames)
     {
         foreach (XmlAttribute attr in element.Attributes)
         {
@@ -96,7 +96,7 @@ internal static class Utils
         return GetNamespacePrefix(a).Equals(nsPrefix);
     }
 
-    internal static bool IsNonRedundantNamespaceDecl(XmlAttribute a, XmlAttribute nearestAncestorWithSamePrefix)
+    internal static bool IsNonRedundantNamespaceDecl(XmlAttribute a, XmlAttribute? nearestAncestorWithSamePrefix)
     {
         if (nearestAncestorWithSamePrefix == null)
             return !IsEmptyDefaultNamespaceNode(a);
@@ -203,7 +203,7 @@ internal static class Utils
         return sb.ToString();
     }
 
-    internal static XmlDocument GetOwnerDocument(XmlNodeList nodeList)
+    internal static XmlDocument? GetOwnerDocument(XmlNodeList nodeList)
     {
         foreach (XmlNode node in nodeList)
         {

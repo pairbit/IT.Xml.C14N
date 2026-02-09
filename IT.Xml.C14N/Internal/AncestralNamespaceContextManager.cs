@@ -9,7 +9,7 @@ internal abstract class AncestralNamespaceContextManager
 
     internal NamespaceFrame GetScopeAt(int i)
     {
-        return (NamespaceFrame)_ancestorStack[i];
+        return (NamespaceFrame)_ancestorStack[i]!;
     }
 
     internal NamespaceFrame GetCurrentScope()
@@ -17,9 +17,9 @@ internal abstract class AncestralNamespaceContextManager
         return GetScopeAt(_ancestorStack.Count - 1);
     }
 
-    protected XmlAttribute GetNearestRenderedNamespaceWithMatchingPrefix(string nsPrefix, out int depth)
+    protected XmlAttribute? GetNearestRenderedNamespaceWithMatchingPrefix(string nsPrefix, out int depth)
     {
-        XmlAttribute attr = null;
+        XmlAttribute? attr = null;
         depth = -1;
         for (int i = _ancestorStack.Count - 1; i >= 0; i--)
         {
@@ -32,9 +32,9 @@ internal abstract class AncestralNamespaceContextManager
         return null;
     }
 
-    protected XmlAttribute GetNearestUnrenderedNamespaceWithMatchingPrefix(string nsPrefix, out int depth)
+    protected XmlAttribute? GetNearestUnrenderedNamespaceWithMatchingPrefix(string nsPrefix, out int depth)
     {
-        XmlAttribute attr = null;
+        XmlAttribute? attr = null;
         depth = -1;
         for (int i = _ancestorStack.Count - 1; i >= 0; i--)
         {

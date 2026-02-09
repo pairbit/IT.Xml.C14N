@@ -20,7 +20,7 @@ internal class ExcCanonicalXmlTest
 
         var str = "<Doc   a  =  '1'  ><!--comment-->Text</Doc >";
         var strC14N = "<Doc a=\"1\">Text</Doc>";
-        var sha256 = "fmcmAi1fbHYhWMToN0wsnUdMfN37CC4SmH8l63to6ZU=";
+        //var sha256 = "fmcmAi1fbHYhWMToN0wsnUdMfN37CC4SmH8l63to6ZU=";
         var gost256 = "da2KtPq2EsLzHE8ZJTJiqlWpz0x+tvTuxJgcN9t4Aas=";
 
         var incHash = new GOST256();
