@@ -59,11 +59,11 @@ internal class ExcCanonicalXmlTest
     }
 
     private static void Write(StringBuilder sb, HashAlgorithm hashAlg, IIncrementalHashAlgorithm incHashAlg,
-        Stream stream, Encoding encoding)
+        Stream stream, Encoding encoding, bool includeComments = false)
     {
         var context = new XmlParserContext(null, null, null, default, enc: encoding);
 
-        var xml = new ExcCanonicalXml(stream, false, null, null, context);
+        var xml = new ExcCanonicalXml(stream, includeComments, null, null, context);
         
         xml.Write(sb);
         xml.WriteHash(hashAlg);
