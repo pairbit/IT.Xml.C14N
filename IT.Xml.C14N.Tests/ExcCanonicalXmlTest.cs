@@ -63,7 +63,7 @@ internal class ExcCanonicalXmlTest
     {
         var context = new XmlParserContext(null, null, null, default, enc: encoding);
 
-        var xml = new ExcCanonicalXml(stream, includeComments, null, null, context);
+        var xml = new ExcCanonicalXml(stream, context, includeComments: includeComments);
         
         xml.Write(sb);
         xml.WriteHash(hashAlg);

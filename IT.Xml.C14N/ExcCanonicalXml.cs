@@ -12,7 +12,7 @@ public sealed class ExcCanonicalXml
     private readonly CanonicalXmlDocument _c14nDoc;
     private readonly ExcAncestralNamespaceContextManager _ancMgr;
 
-    public ExcCanonicalXml(Stream inputStream, bool includeComments = false, string? inclusiveNamespacesPrefixList = null, XmlResolver? resolver = null, XmlParserContext? inputContext = null)
+    public ExcCanonicalXml(Stream inputStream, XmlParserContext? inputContext = null, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
     {
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
@@ -28,7 +28,7 @@ public sealed class ExcCanonicalXml
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    public ExcCanonicalXml(Stream inputStream, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver, string strBaseUri)
+    public ExcCanonicalXml(Stream inputStream, string strBaseUri, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
     {
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
@@ -44,7 +44,7 @@ public sealed class ExcCanonicalXml
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    public ExcCanonicalXml(XmlDocument document, bool includeComments = false, string? inclusiveNamespacesPrefixList = null, XmlResolver? resolver = null)
+    public ExcCanonicalXml(XmlDocument document, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
     {
         if (document == null)
             throw new ArgumentNullException(nameof(document));
@@ -58,7 +58,7 @@ public sealed class ExcCanonicalXml
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    public ExcCanonicalXml(XmlNodeList nodeList, bool includeComments = false, string? inclusiveNamespacesPrefixList = null, XmlResolver? resolver = null)
+    public ExcCanonicalXml(XmlNodeList nodeList, XmlResolver? resolver = null, bool includeComments = false, string? inclusiveNamespacesPrefixList = null)
     {
         if (nodeList == null)
             throw new ArgumentNullException(nameof(nodeList));
