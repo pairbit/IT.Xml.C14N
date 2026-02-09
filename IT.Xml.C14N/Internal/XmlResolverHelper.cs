@@ -1,12 +1,13 @@
 ﻿#nullable enable
+using IT;
 using System;
 using System.Net;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace IT.Xml.C14N;
+namespace IT.Xml.C14N.Internal;
 
-public static class XmlResolverHelper
+internal static class XmlResolverHelper
 {
     public static XmlResolver GetThrowingResolver()
     {

@@ -17,6 +17,9 @@ public sealed class ExcCanonicalXml
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
 
+        if (resolver == null)
+            resolver = XmlResolverHelper.GetThrowingResolver();
+
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
         _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, inputContext));
@@ -28,6 +31,9 @@ public sealed class ExcCanonicalXml
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
 
+        if (resolver == null)
+            resolver = XmlResolverHelper.GetThrowingResolver();
+
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
         _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, strBaseUri));
@@ -38,6 +44,9 @@ public sealed class ExcCanonicalXml
     {
         if (document == null)
             throw new ArgumentNullException(nameof(document));
+
+        if (resolver == null)
+            resolver = XmlResolverHelper.GetThrowingResolver();
 
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
@@ -53,6 +62,9 @@ public sealed class ExcCanonicalXml
         XmlDocument doc = Utils.GetOwnerDocument(nodeList);
         if (doc == null)
             throw new ArgumentException(nameof(nodeList));
+
+        if (resolver == null)
+            resolver = XmlResolverHelper.GetThrowingResolver();
 
         _c14nDoc = new CanonicalXmlDocument(false, includeComments);
         _c14nDoc.XmlResolver = resolver;
