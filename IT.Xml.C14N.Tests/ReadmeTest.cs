@@ -29,20 +29,20 @@ public class ReadmeTest
     {
         using var stream = new MemoryStream(_xmlBytes);
 
-        var c14N = new XmlDsigExcC14NTransform();
-        c14N.LoadInput(stream);
-        var transformedStream = (Stream)c14N.GetOutput();
+        var c14N = new ExcCanonicalXml(stream);
 
-        var transformedBytes = new byte[transformedStream.Length];
-        transformedStream.Read(transformedBytes, 0, transformedBytes.Length);
+        var sb = new StringBuilder();
+        c14N.Write(sb);
+
+        var transformedString = sb.ToString();
+        Assert.That(transformedString, Is.EqualTo(_xmlC14N));
+
+        var transformedBytes = Encoding.UTF8.GetBytes(transformedString);
 
         //using var hashAlg = new Gost_R3411_2012_256_HashAlgorithm();
         using var hashAlg = SHA256.Create();
         var hash = hashAlg.ComputeHash(transformedBytes);
         Assert.That(hash.SequenceEqual(_hashC14N));
-
-        var transformedXml = Encoding.UTF8.GetString(transformedBytes);
-        Assert.That(transformedXml, Is.EqualTo(_xmlC14N));
     }
 
     [Test]
@@ -52,10 +52,12 @@ public class ReadmeTest
         using var hashAlg = SHA256.Create();
         using var stream = new MemoryStream(_xmlBytes);
 
-        var c14N = new XmlDsigExcC14NTransform();
-        c14N.LoadInput(stream);
-        var hash = c14N.GetDigestedOutput(hashAlg);
+        var c14N = new ExcCanonicalXml(stream);
 
-        Assert.That(hash.SequenceEqual(_hashC14N));
+        c14N.WriteHash(hashAlg);
+
+        hashAlg.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+
+        Assert.That(hashAlg.Hash.AsSpan().SequenceEqual(_hashC14N));
     }
 }

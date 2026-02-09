@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Xml;
+﻿using System.Xml;
 
 namespace IT.Xml.C14N.Internal;
 

@@ -12,7 +12,7 @@ public sealed class CanonicalXml
     private readonly CanonicalXmlDocument _c14nDoc;
     private readonly C14NAncestralNamespaceContextManager _ancMgr;
 
-    public CanonicalXml(Stream inputStream, bool includeComments, XmlResolver resolver, XmlParserContext inputContext)
+    public CanonicalXml(Stream inputStream, XmlParserContext? inputContext = null, XmlResolver? resolver = null, bool includeComments = false)
     {
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
@@ -20,13 +20,15 @@ public sealed class CanonicalXml
         if (resolver == null)
             resolver = XmlResolverHelper.GetThrowingResolver();
 
+        var settings = Utils.GetSecureXmlReaderSettings(resolver);
+
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
-        _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, inputContext));
+        _c14nDoc.Load(XmlReader.Create(inputStream, settings, inputContext));
         _ancMgr = new C14NAncestralNamespaceContextManager();
     }
 
-    public CanonicalXml(Stream inputStream, bool includeComments, XmlResolver resolver, string strBaseUri)
+    public CanonicalXml(Stream inputStream, string strBaseUri, XmlResolver? resolver = null, bool includeComments = false)
     {
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
@@ -34,15 +36,15 @@ public sealed class CanonicalXml
         if (resolver == null)
             resolver = XmlResolverHelper.GetThrowingResolver();
 
+        var settings = Utils.GetSecureXmlReaderSettings(resolver);
+
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
-        _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, strBaseUri));
+        _c14nDoc.Load(XmlReader.Create(inputStream, settings, strBaseUri));
         _ancMgr = new C14NAncestralNamespaceContextManager();
     }
 
-    public CanonicalXml(XmlDocument document, XmlResolver resolver) : this(document, resolver, false) { }
-
-    public CanonicalXml(XmlDocument document, XmlResolver resolver, bool includeComments)
+    public CanonicalXml(XmlDocument document, XmlResolver? resolver = null, bool includeComments = false)
     {
         if (document == null)
             throw new ArgumentNullException(nameof(document));
@@ -56,7 +58,7 @@ public sealed class CanonicalXml
         _ancMgr = new C14NAncestralNamespaceContextManager();
     }
 
-    public CanonicalXml(XmlNodeList nodeList, XmlResolver resolver, bool includeComments)
+    public CanonicalXml(XmlNodeList nodeList, XmlResolver? resolver = null, bool includeComments = false)
     {
         if (nodeList == null)
             throw new ArgumentNullException(nameof(nodeList));
@@ -89,23 +91,6 @@ public sealed class CanonicalXml
     public void AppendHash(IIncrementalHashAlgorithm hash)
     {
         _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
-    }
-
-    public byte[] GetBytes()
-    {
-        StringBuilder sb = new StringBuilder();
-        _c14nDoc.Write(sb, DocPosition.BeforeRootElement, _ancMgr);
-        return Encoding.UTF8.GetBytes(sb.ToString());
-    }
-
-    public byte[] GetDigestedBytes(HashAlgorithm hash)
-    {
-        _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
-        hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-        byte[] res = (byte[])hash.Hash!.Clone();
-        // reinitialize the hash so it is still usable after the call
-        hash.Initialize();
-        return res;
     }
 
     private static void MarkInclusionStateForNodes(XmlNodeList nodeList, XmlDocument inputRoot, XmlDocument root)

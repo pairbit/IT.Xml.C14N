@@ -9,7 +9,7 @@ internal sealed class ExcAncestralNamespaceContextManager : AncestralNamespaceCo
 {
     private readonly Hashtable _inclusivePrefixSet;
 
-    internal ExcAncestralNamespaceContextManager(string inclusiveNamespacesPrefixList)
+    internal ExcAncestralNamespaceContextManager(string? inclusiveNamespacesPrefixList)
     {
         _inclusivePrefixSet = Utils.TokenizePrefixListString(inclusiveNamespacesPrefixList);
     }

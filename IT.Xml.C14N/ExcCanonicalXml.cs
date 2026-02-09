@@ -12,17 +12,19 @@ public sealed class ExcCanonicalXml
     private readonly CanonicalXmlDocument _c14nDoc;
     private readonly ExcAncestralNamespaceContextManager _ancMgr;
 
-    public ExcCanonicalXml(Stream inputStream, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver, XmlParserContext inputContext)
+    public ExcCanonicalXml(Stream inputStream, bool includeComments = false, string? inclusiveNamespacesPrefixList = null, XmlResolver? resolver = null, XmlParserContext? inputContext = null)
     {
         if (inputStream == null)
             throw new ArgumentNullException(nameof(inputStream));
 
         if (resolver == null)
             resolver = XmlResolverHelper.GetThrowingResolver();
+        
+        var settings = Utils.GetSecureXmlReaderSettings(resolver);
 
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
-        _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, inputContext));
+        _c14nDoc.Load(XmlReader.Create(inputStream, settings, inputContext));
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
@@ -34,13 +36,15 @@ public sealed class ExcCanonicalXml
         if (resolver == null)
             resolver = XmlResolverHelper.GetThrowingResolver();
 
+        var settings = Utils.GetSecureXmlReaderSettings(resolver);
+
         _c14nDoc = new CanonicalXmlDocument(true, includeComments);
         _c14nDoc.XmlResolver = resolver;
-        _c14nDoc.Load(Utils.PreProcessStreamInput(inputStream, resolver, strBaseUri));
+        _c14nDoc.Load(XmlReader.Create(inputStream, settings, strBaseUri));
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    public ExcCanonicalXml(XmlDocument document, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
+    public ExcCanonicalXml(XmlDocument document, bool includeComments = false, string? inclusiveNamespacesPrefixList = null, XmlResolver? resolver = null)
     {
         if (document == null)
             throw new ArgumentNullException(nameof(document));
@@ -54,7 +58,7 @@ public sealed class ExcCanonicalXml
         _ancMgr = new ExcAncestralNamespaceContextManager(inclusiveNamespacesPrefixList);
     }
 
-    public ExcCanonicalXml(XmlNodeList nodeList, bool includeComments, string inclusiveNamespacesPrefixList, XmlResolver resolver)
+    public ExcCanonicalXml(XmlNodeList nodeList, bool includeComments = false, string? inclusiveNamespacesPrefixList = null, XmlResolver? resolver = null)
     {
         if (nodeList == null)
             throw new ArgumentNullException(nameof(nodeList));
@@ -87,23 +91,6 @@ public sealed class ExcCanonicalXml
     public void AppendHash(IIncrementalHashAlgorithm hash)
     {
         _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
-    }
-
-    public byte[] GetBytes()
-    {
-        StringBuilder sb = new StringBuilder();
-        _c14nDoc.Write(sb, DocPosition.BeforeRootElement, _ancMgr);
-        return Encoding.UTF8.GetBytes(sb.ToString());
-    }
-
-    public byte[] GetDigestedBytes(HashAlgorithm hash)
-    {
-        _c14nDoc.WriteHash(hash, DocPosition.BeforeRootElement, _ancMgr);
-        hash.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-        byte[] res = (byte[])hash.Hash.Clone();
-        // reinitialize the hash so it is still usable after the call
-        hash.Initialize();
-        return res;
     }
 
     private static void MarkInclusionStateForNodes(XmlNodeList nodeList, XmlDocument inputRoot, XmlDocument root)

@@ -126,20 +126,6 @@ internal static class Utils
         }
     }
 
-    internal static XmlReader PreProcessStreamInput(Stream inputStream, XmlResolver xmlResolver, XmlParserContext inputContext)
-    {
-        XmlReaderSettings settings = GetSecureXmlReaderSettings(xmlResolver);
-        XmlReader reader = XmlReader.Create(inputStream, settings, inputContext);
-        return reader;
-    }
-
-    internal static XmlReader PreProcessStreamInput(Stream inputStream, XmlResolver xmlResolver, string baseUri)
-    {
-        XmlReaderSettings settings = GetSecureXmlReaderSettings(xmlResolver);
-        XmlReader reader = XmlReader.Create(inputStream, settings, baseUri);
-        return reader;
-    }
-
     internal static XmlReaderSettings GetSecureXmlReaderSettings(XmlResolver xmlResolver)
     {
         XmlReaderSettings settings = new XmlReaderSettings();
@@ -159,9 +145,9 @@ internal static class Utils
         return false;
     }
 
-    internal static Hashtable TokenizePrefixListString(string s)
+    internal static Hashtable TokenizePrefixListString(string? s)
     {
-        Hashtable set = new Hashtable();
+        var set = new Hashtable();
         if (s != null)
         {
             string[] prefixes = s.Split(null);
