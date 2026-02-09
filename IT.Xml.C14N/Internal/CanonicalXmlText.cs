@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlText : XmlText, ICanonicalizableNode
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlText(string strData, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlText(string? strData, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(strData, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;
@@ -31,9 +31,15 @@ internal sealed class CanonicalXmlText : XmlText, ICanonicalizableNode
     {
         if (IsInNodeSet)
         {
-            UTF8Encoding utf8 = new UTF8Encoding(false);
-            byte[] rgbData = utf8.GetBytes(Utils.EscapeTextData(Value));
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeTextData(Value)));
+        }
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (IsInNodeSet)
+        {
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeTextData(Value)));
         }
     }
 }

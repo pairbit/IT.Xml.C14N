@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlSignificantWhitespace : XmlSignificantWhitespa
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlSignificantWhitespace(string strData, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlSignificantWhitespace(string? strData, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(strData, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;
@@ -31,9 +31,15 @@ internal sealed class CanonicalXmlSignificantWhitespace : XmlSignificantWhitespa
     {
         if (IsInNodeSet && docPos == DocPosition.InRootElement)
         {
-            UTF8Encoding utf8 = new UTF8Encoding(false);
-            byte[] rgbData = utf8.GetBytes(Utils.EscapeWhitespaceData(Value));
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeWhitespaceData(Value)));
+        }
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (IsInNodeSet && docPos == DocPosition.InRootElement)
+        {
+            hash.Append(Encoding.UTF8.GetBytes(Utils.EscapeWhitespaceData(Value)));
         }
     }
 }

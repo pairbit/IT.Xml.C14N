@@ -1,4 +1,3 @@
-using IT.Hashing.Gost.Native;
 using System;
 using System.IO;
 using System.Linq;
@@ -41,7 +40,7 @@ public class TransformTest
         doc.LoadXml(data);
 
         //'\r' -> &#xD;
-        var hash1 = IT_TransformC14(doc, hashAlg);
+        var hash1 = IT_TransformC14(new ExcCanonicalXml(doc), hashAlg);
         var hash2 = Sys_TransformC14(doc, hashAlg);
 
         Assert.That(hash1.SequenceEqual(hash2), Is.True);
@@ -57,7 +56,7 @@ public class TransformTest
 
         using var stream = new MemoryStream(_dataBytes);
 
-        var hash1 = IT_TransformC14(stream, hashAlg);
+        var hash1 = IT_TransformC14(new ExcCanonicalXml(stream), hashAlg);
 
         stream.Position = 0;
         var hash2 = Sys_TransformC14(stream, hashAlg);
@@ -67,13 +66,15 @@ public class TransformTest
         Assert.That(_hash.SequenceEqual(hash1), Is.True);
     }
 
-    private static byte[] IT_TransformC14(object input, HashAlgorithm hashAlg)
+    private static byte[] IT_TransformC14(ExcCanonicalXml xml, HashAlgorithm hashAlg)
     {
-        var c14NTransform = new XmlDsigExcC14NTransform();
+        hashAlg.Initialize();
 
-        c14NTransform.LoadInput(input);
+        xml.WriteHash(hashAlg);
 
-        return c14NTransform.GetDigestedOutput(hashAlg);
+        hashAlg.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+
+        return hashAlg.Hash!;
     }
 
     private static byte[] Sys_TransformC14(object input, HashAlgorithm hashAlg)
@@ -82,6 +83,7 @@ public class TransformTest
 
         c14NTransform.LoadInput(input);
 
+        hashAlg.Initialize();
         return c14NTransform.GetDigestedOutput(hashAlg);
     }
 }

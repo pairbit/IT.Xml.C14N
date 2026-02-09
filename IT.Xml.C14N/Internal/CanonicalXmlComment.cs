@@ -10,7 +10,7 @@ internal sealed class CanonicalXmlComment : XmlComment, ICanonicalizableNode
     private bool _isInNodeSet;
     private readonly bool _includeComments;
 
-    public CanonicalXmlComment(string comment, XmlDocument doc, bool defaultNodeSetInclusionState, bool includeComments)
+    public CanonicalXmlComment(string? comment, XmlDocument doc, bool defaultNodeSetInclusionState, bool includeComments)
         : base(comment, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;
@@ -47,20 +47,32 @@ internal sealed class CanonicalXmlComment : XmlComment, ICanonicalizableNode
         if (!IsInNodeSet || !IncludeComments)
             return;
 
-        UTF8Encoding utf8 = new UTF8Encoding(false);
-        byte[] rgbData = utf8.GetBytes("(char) 10");
+        var utf8 = Encoding.UTF8;
         if (docPos == DocPosition.AfterRootElement)
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes("<!--");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes(Value);
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes("-->");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
+        hash.Append(utf8.GetBytes("<!--"));
+        hash.Append(utf8.GetBytes(Value));
+        hash.Append(utf8.GetBytes("-->"));
         if (docPos == DocPosition.BeforeRootElement)
         {
-            rgbData = utf8.GetBytes("(char) 10");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
+        }
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (!IsInNodeSet || !IncludeComments)
+            return;
+
+        var utf8 = Encoding.UTF8;
+        if (docPos == DocPosition.AfterRootElement)
+            hash.Append(utf8.GetBytes("(char) 10"));
+        hash.Append("<!--"u8);
+        hash.Append(utf8.GetBytes(Value));
+        hash.Append("-->"u8);
+        if (docPos == DocPosition.BeforeRootElement)
+        {
+            hash.Append(utf8.GetBytes("(char) 10"));
         }
     }
 }

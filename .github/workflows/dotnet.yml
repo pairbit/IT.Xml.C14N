@@ -1,0 +1,48 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: test
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            3.1.x
+            6.0.x
+            7.0.x
+            8.0.x
+            10.0.x
+            
+      - name: Restore
+        run: dotnet restore IT.Xml.C14N.sln
+    
+      - name: Build
+        run: dotnet build IT.Xml.C14N.sln --configuration Release --no-restore 
+        
+      - name: Test
+        run: dotnet test IT.Xml.C14N.Tests/IT.Xml.C14N.Tests.csproj --no-restore
+
+  publish:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish IT.Xml.C14N
+        uses: pairbit/publish-nuget@v2.6.1
+        with:
+            PROJECT_FILE_PATH: IT.Xml.C14N/IT.Xml.C14N.csproj
+            NUGET_KEY: ${{secrets.NUGET}}
+            TAG_COMMIT: true

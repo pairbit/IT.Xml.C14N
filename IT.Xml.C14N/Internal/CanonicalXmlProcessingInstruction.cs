@@ -9,7 +9,7 @@ internal sealed class CanonicalXmlProcessingInstruction : XmlProcessingInstructi
 {
     private bool _isInNodeSet;
 
-    public CanonicalXmlProcessingInstruction(string target, string data, XmlDocument doc, bool defaultNodeSetInclusionState)
+    public CanonicalXmlProcessingInstruction(string target, string? data, XmlDocument doc, bool defaultNodeSetInclusionState)
         : base(target, data, doc)
     {
         _isInNodeSet = defaultNodeSetInclusionState;
@@ -42,28 +42,45 @@ internal sealed class CanonicalXmlProcessingInstruction : XmlProcessingInstructi
         if (!IsInNodeSet)
             return;
 
-        UTF8Encoding utf8 = new UTF8Encoding(false);
-        byte[] rgbData;
+        var utf8 = Encoding.UTF8;
         if (docPos == DocPosition.AfterRootElement)
         {
-            rgbData = utf8.GetBytes("(char) 10");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
         }
-        rgbData = utf8.GetBytes("<?");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
-        rgbData = utf8.GetBytes(Name);
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+        hash.Append(utf8.GetBytes("<?"));
+        hash.Append(utf8.GetBytes(Name));
         if (Value != null && Value.Length > 0)
         {
-            rgbData = utf8.GetBytes(" " + Value);
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes(" " + Value));
         }
-        rgbData = utf8.GetBytes("?>");
-        hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+        hash.Append(utf8.GetBytes("?>"));
         if (docPos == DocPosition.BeforeRootElement)
         {
-            rgbData = utf8.GetBytes("(char) 10");
-            hash.TransformBlock(rgbData, 0, rgbData.Length, rgbData, 0);
+            hash.Append(utf8.GetBytes("(char) 10"));
+        }
+    }
+
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        if (!IsInNodeSet)
+            return;
+
+        var utf8 = Encoding.UTF8;
+        if (docPos == DocPosition.AfterRootElement)
+        {
+            hash.Append(utf8.GetBytes("(char) 10"));
+        }
+        hash.Append("<?"u8);
+        hash.Append(utf8.GetBytes(Name));
+        if (Value != null && Value.Length > 0)
+        {
+            hash.Append((byte)' ');
+            hash.Append(utf8.GetBytes(Value));
+        }
+        hash.Append("?>"u8);
+        if (docPos == DocPosition.BeforeRootElement)
+        {
+            hash.Append(utf8.GetBytes("(char) 10"));
         }
     }
 }

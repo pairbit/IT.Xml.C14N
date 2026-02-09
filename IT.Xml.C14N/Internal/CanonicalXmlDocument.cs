@@ -59,42 +59,59 @@ internal sealed class CanonicalXmlDocument : XmlDocument, ICanonicalizableNode
         }
     }
 
-    public override XmlElement CreateElement(string prefix, string localName, string namespaceURI)
+    public void WriteHash(IIncrementalHashAlgorithm hash, DocPosition docPos, AncestralNamespaceContextManager anc)
+    {
+        docPos = DocPosition.BeforeRootElement;
+        foreach (XmlNode childNode in ChildNodes)
+        {
+            if (childNode.NodeType == XmlNodeType.Element)
+            {
+                CanonicalizationDispatcher.WriteHash(childNode, hash, DocPosition.InRootElement, anc);
+                docPos = DocPosition.AfterRootElement;
+            }
+            else
+            {
+                CanonicalizationDispatcher.WriteHash(childNode, hash, docPos, anc);
+            }
+        }
+    }
+
+    public override XmlElement CreateElement(string? prefix, string localName, string? namespaceURI)
     {
         return new CanonicalXmlElement(prefix, localName, namespaceURI, this, _defaultNodeSetInclusionState);
     }
 
-    public override XmlAttribute CreateAttribute(string prefix, string localName, string namespaceURI)
+    public override XmlAttribute CreateAttribute(string? prefix, string localName, string? namespaceURI)
     {
         return new CanonicalXmlAttribute(prefix, localName, namespaceURI, this, _defaultNodeSetInclusionState);
     }
 
-    protected override XmlAttribute CreateDefaultAttribute(string prefix, string localName, string namespaceURI)
+    protected override XmlAttribute CreateDefaultAttribute(string? prefix, string localName, string? namespaceURI)
     {
         return new CanonicalXmlAttribute(prefix, localName, namespaceURI, this, _defaultNodeSetInclusionState);
     }
 
-    public override XmlText CreateTextNode(string text)
+    public override XmlText CreateTextNode(string? text)
     {
         return new CanonicalXmlText(text, this, _defaultNodeSetInclusionState);
     }
 
-    public override XmlWhitespace CreateWhitespace(string prefix)
+    public override XmlWhitespace CreateWhitespace(string? prefix)
     {
         return new CanonicalXmlWhitespace(prefix, this, _defaultNodeSetInclusionState);
     }
 
-    public override XmlSignificantWhitespace CreateSignificantWhitespace(string text)
+    public override XmlSignificantWhitespace CreateSignificantWhitespace(string? text)
     {
         return new CanonicalXmlSignificantWhitespace(text, this, _defaultNodeSetInclusionState);
     }
 
-    public override XmlProcessingInstruction CreateProcessingInstruction(string target, string data)
+    public override XmlProcessingInstruction CreateProcessingInstruction(string target, string? data)
     {
         return new CanonicalXmlProcessingInstruction(target, data, this, _defaultNodeSetInclusionState);
     }
 
-    public override XmlComment CreateComment(string data)
+    public override XmlComment CreateComment(string? data)
     {
         return new CanonicalXmlComment(data, this, _defaultNodeSetInclusionState, _includeComments);
     }
@@ -104,7 +121,7 @@ internal sealed class CanonicalXmlDocument : XmlDocument, ICanonicalizableNode
         return new CanonicalXmlEntityReference(name, this, _defaultNodeSetInclusionState);
     }
 
-    public override XmlCDataSection CreateCDataSection(string data)
+    public override XmlCDataSection CreateCDataSection(string? data)
     {
         return new CanonicalXmlCDataSection(data, this, _defaultNodeSetInclusionState);
     }
