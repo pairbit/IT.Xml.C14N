@@ -4,7 +4,7 @@
 [![GitHub Actions](https://github.com/pairbit/IT.Xml.C14N/workflows/Build/badge.svg)](https://github.com/pairbit/IT.Xml.C14N/actions)
 [![Releases](https://img.shields.io/github/release/pairbit/IT.Xml.C14N.svg)](https://github.com/pairbit/IT.Xml.C14N/releases)
 
-Implementation of C14N XML Transform
+XML Canonicalization
 
 ## How to transform
 
@@ -15,19 +15,19 @@ var hashC14N = Convert.FromBase64String("/VfhzVfGVK9EQibaw14T+h+BuduE02JYxobW1T+
 
 using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
 
-var c14N = new XmlDsigExcC14NTransform();
-c14N.LoadInput(stream);
-var transformedStream = (Stream)c14N.GetOutput();
+var c14N = new ExcCanonicalXml(stream);
 
-var transformedBytes = new byte[transformedStream.Length];
-transformedStream.Read(transformedBytes, 0, transformedBytes.Length);
+var sb = new StringBuilder();
+c14N.Write(sb);
+
+var transformedString = sb.ToString();
+Assert.That(transformedString, Is.EqualTo(xmlC14N));
+
+var transformedBytes = Encoding.UTF8.GetBytes(transformedString);
 
 using var hashAlg = SHA256.Create();
 var hash = hashAlg.ComputeHash(transformedBytes);
 Assert.That(hash.SequenceEqual(hashC14N));
-
-var transformedXml = Encoding.UTF8.GetString(transformedBytes);
-Assert.That(transformedXml, Is.EqualTo(xmlC14N));
 ```
 
 ## How to calculate hash
@@ -39,9 +39,11 @@ var hashC14N = Convert.FromBase64String("/VfhzVfGVK9EQibaw14T+h+BuduE02JYxobW1T+
 using var hashAlg = SHA256.Create();
 using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
 
-var c14N = new XmlDsigExcC14NTransform();
-c14N.LoadInput(stream);
-var hash = c14N.GetDigestedOutput(hashAlg);
+var c14N = new ExcCanonicalXml(stream);
 
-Assert.That(hash.SequenceEqual(hashC14N));
+c14N.WriteHash(hashAlg);
+
+hashAlg.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+
+Assert.That(hashAlg.Hash.AsSpan().SequenceEqual(hashC14N));
 ```
