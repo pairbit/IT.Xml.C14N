@@ -1,8 +1,4 @@
 ﻿#nullable enable
-using IT;
-using System;
-using System.Net;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace IT.Xml.C14N.Internal;
@@ -11,7 +7,7 @@ internal static class XmlResolverHelper
 {
     public static XmlResolver GetThrowingResolver()
     {
-#if NET7_0_OR_GREATER
+#if NET
         return XmlResolver.ThrowingResolver;
 #else
         return XmlThrowingResolver.s_singleton;
@@ -28,17 +24,17 @@ internal static class XmlResolverHelper
             // Private constructor ensures existing only one instance of XmlThrowingResolver
             private XmlThrowingResolver() { }
 
-            public override ICredentials Credentials
+            public override System.Net.ICredentials Credentials
             {
                 set { /* Do nothing */ }
             }
 
-            public override object GetEntity(Uri absoluteUri, string? role, Type? ofObjectToReturn)
+            public override object GetEntity(System.Uri absoluteUri, string? role, System.Type? ofObjectToReturn)
             {
                 throw new XmlException("Cryptography_Xml_EntityResolutionNotSupported");
             }
 
-            public override Task<object> GetEntityAsync(Uri absoluteUri, string? role, Type? ofObjectToReturn)
+            public override System.Threading.Tasks.Task<object> GetEntityAsync(System.Uri absoluteUri, string? role, System.Type? ofObjectToReturn)
             {
                 throw new XmlException("Cryptography_Xml_EntityResolutionNotSupported");
             }
